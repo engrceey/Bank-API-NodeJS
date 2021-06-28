@@ -1,0 +1,20 @@
+{
+  "name": "minibankexpress",
+  "version": "1.0.0",
+  "description": "mini_bank",
+  "main": "server.js",
+  "scripts": {
+    "migrate": "npx sequelize-cli db:migrate",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zurum",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.6.4",
+    "uuid": "^8.3.2"
+  }
+}
