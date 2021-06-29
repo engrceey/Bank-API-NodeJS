@@ -1,6 +1,6 @@
 const DB = require('../database/models');
 
-const AuthValidation = async (req, res, next) => {
+const Authenticate = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
   if (authHeader) {
@@ -21,5 +21,5 @@ const AuthValidation = async (req, res, next) => {
 }
 
 
-module.exports = {AuthValidation}
+module.exports = {Authenticate}
 

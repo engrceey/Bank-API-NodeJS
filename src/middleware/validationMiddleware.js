@@ -1,13 +1,14 @@
 const Joi = require('joi');
 
+
 const validateLoginDetails = async (req, res, next) => {
     try {
         const loginSchema = Joi.object({
             email: Joi.string().email().trim().required(),
             password: Joi.string().trim().required(),
         });
-        let error = await joyValidate(loginSchema, req);
-        if (error) return res.status(400).send(error);
+        let error = await loginSchema.validate(loginSchema, req.body);
+        if (error) return res.status(422).send(error);
 
         return next();
     } catch (error) {
@@ -25,11 +26,13 @@ const validateSignUpDetails = async (req, res, next) => {
       role: Joi.string().trim().required(),
     });
 
-    let error = await joyValidate(signUpSchema, req);
-    if (error) return res.status(400).send(error);
+    let error = await signUpSchema.validate(signUpSchema, req.body);
+    if (error) return res.status(422).send(error);
 
     return next();
   } catch (error) {
       return next(error.message);
   }
 }
+
+module.exports = {validateSignUpDetails, validateLoginDetails}
