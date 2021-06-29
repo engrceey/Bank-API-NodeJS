@@ -30,7 +30,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   account.associate = function(models) {
     // associations can be defined here
-    
+    account.belongsTo(models.User)
+
   };
   return account;
 };
