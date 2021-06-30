@@ -104,4 +104,72 @@ const getUsers = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, signInUser, getUser, getUsers };
+const updateUser = async (req, res, next) => {
+  try {
+    let user = await User.findOne({
+      where: { email: req.body.email },
+    });
+
+    if (!user) return res.status(400).json({ message: "user does not exist" });
+
+    if (req.user.email !== user.email)
+      return res.status(403).json("You can't edit this Profile");
+
+    const result = await User.update(
+      {
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        phone_number: req.body.phonenumber,
+      },
+
+      {
+        where: {
+          email: req.body.email,
+        },
+      }
+    );
+
+    let updatedUser = await User.findOne({
+      where: { email: req.body.email },
+    });
+
+    res.status(200).json({ data: updatedUser });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Something went wrong, we're working on it" });
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  try {
+    let user = await User.findOne({
+      where: { email: req.body.email },
+    });
+
+    if (!user) return res.status(400).json({ message: "user does not exist" });
+
+    await User.destroy({
+      where: {
+        email: req.body.email,
+      },
+    });
+
+    res.status(200).json({ message: "User deleted" });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Something went wrong, we're working on it" });
+  }
+};
+
+module.exports = {
+  registerUser,
+  signInUser,
+  getUser,
+  getUsers,
+  updateUser,
+  deleteUser,
+};
