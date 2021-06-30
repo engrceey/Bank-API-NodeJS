@@ -5,7 +5,6 @@ const { User } = db;
 
 const registerUser = async (req, res, next) => {
   try {
-    console.log(req.body);
     let userExits = await User.findOne({
       where: { email: req.body.email },
     });
@@ -27,13 +26,7 @@ const registerUser = async (req, res, next) => {
       role: req.body.role,
     });
 
-    console.log(user.email);
-
-    const accessToken = jwt.sign(
-      { email: user.email, role: user.role },
-      process.env.SECRET
-    );
-    res.status(201).json(accessToken);
+    res.send(getJsonToken(user));
   } catch (err) {
     console.error(err);
     res
@@ -47,12 +40,11 @@ const signInUser = async (req, res, next) => {
     let user = await User.findOne({
       where: { email: req.body.email },
     });
-    console.log("Getting to this place 1");
+
     if (!user) {
-      console.log("problem");
       res.status(404).json({ message: "invalid sign in details" });
     }
-    console.log("Getting to this place 2");
+
     const passwordIsValid = bcrypt.compareSync(
       req.body.password,
       user.password
@@ -64,12 +56,8 @@ const signInUser = async (req, res, next) => {
         message: "invalid sign in details",
       });
     }
-    console.log("Getting to this place 3");
-    const accessToken = jwt.sign(
-      { email: user.email, role: user.role },
-      process.env.SECRET
-    );
-    res.status(200).json({ token: accessToken, message: "Sign in successful" });
+
+    res.send(getJsonToken(user));
   } catch (err) {
     console.error(err);
     res
@@ -78,4 +66,42 @@ const signInUser = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, signInUser };
+const getJsonToken = (user) => {
+  const accessToken = jwt.sign(
+    { email: user.email, role: user.role },
+    process.env.SECRET,
+    { expiresIn: "20m" }
+  );
+  return { token: accessToken };
+};
+
+const getUser = async (req, res, next) => {
+  try {
+    let user = await User.findOne({
+      where: { email: req.body.email },
+    });
+
+    if (!user) return res.status(400).json({ message: "user does not exist" });
+    res.status(200).json({ data: user });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Something went wrong, we're working on it" });
+  }
+};
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.findAll();
+    if (!users) return res.status(404).send("No user found");
+    res.status(200).json({ data: users });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Something went wrong, we're working on it" });
+  }
+};
+
+module.exports = { registerUser, signInUser, getUser, getUsers };
