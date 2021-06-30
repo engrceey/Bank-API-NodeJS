@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: { msg: "Role must not be empty" },
       },
     },
+    phone_number: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    }
   }, {});
   User.associate = function(models) {
     // associations can be defined here
