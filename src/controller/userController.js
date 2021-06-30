@@ -27,6 +27,7 @@ const registerUser = async (req, res, next) => {
     });
 
     res.send(getJsonToken(user));
+
   } catch (err) {
     console.error(err);
     res
@@ -70,7 +71,7 @@ const getJsonToken = (user) => {
   const accessToken = jwt.sign(
     { email: user.email, role: user.role },
     process.env.SECRET,
-    { expiresIn: "20m" }
+    { expiresIn: "120m" }
   );
   return { token: accessToken };
 };
@@ -94,6 +95,7 @@ const getUser = async (req, res, next) => {
 const getUsers = async (req, res) => {
   try {
     const users = await User.findAll();
+    console.log(req.user);
     if (!users) return res.status(404).send("No user found");
     res.status(200).json({ data: users });
   } catch (err) {

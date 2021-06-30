@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     accountNumber: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: true,
     },
     accountBalance: {
       type: DataTypes.INTEGER,
@@ -26,7 +27,13 @@ module.exports = (sequelize, DataTypes) => {
                     'foreign'
                 ],
                 defaultValue: 'savings'
-    }
+    },
+    pin:
+        {
+          type: DataTypes.STRING,
+          allowNull: false,
+          equals: 4,
+        }
   }, {});
   account.associate = function(models) {
     // associations can be defined here
