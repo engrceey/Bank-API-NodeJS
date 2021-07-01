@@ -95,7 +95,7 @@ const getUser = async (req, res, next) => {
 const getUsers = async (req, res) => {
   try {
     const users = await User.findAll();
-    console.log(req.user);
+    
     if (!users) return res.status(404).send("No user found");
     res.status(200).json({ data: users });
   } catch (err) {
