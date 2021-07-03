@@ -1,7 +1,7 @@
 const express = require("express");
 const { Authenticate, isAdmin } = require("../middleware/authMiddleware");
 const {
-  deposit, withdraw
+  deposit, withdraw, getAllTransactions, getTransaction, transfer
 } = require("../controller/transactionController");
 
 const router = express.Router();
@@ -19,8 +19,26 @@ router.get(
   withdraw
 )
 
+router.get(
+  '/',
+  Authenticate,
+  getTransaction
+)
 
-// Deposit
+router.get(
+  '/transactions',
+  Authenticate,
+  isAdmin,
+  getAllTransactions
+)
+
+router.get(
+  '/transfer',
+  Authenticate,
+  transfer
+)
+
+
 // Transfer
 // Get transaction 
 
