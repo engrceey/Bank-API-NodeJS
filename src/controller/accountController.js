@@ -31,11 +31,12 @@ const createAccount = async (req, res) => {
       accountType: req.body.accountType,
       UserId: user.id,
       accountNumber: genAccountNumber,
+      currency: req.body.currency
     });
 
     res.status(201).json({ account: newAccount });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -71,7 +72,7 @@ const changePin = async (req, res) => {
 
     res.status(200).json({ "new pin": req.body.pin });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -102,7 +103,7 @@ const deleteYourAccount = async (req, res) => {
 
     res.status(202).json({ message: "account deleted" });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -137,7 +138,7 @@ const deleteAccount = async (req, res) => {
 
     res.status(202).json({ message: "account deleted" });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -165,7 +166,7 @@ const getAccount = async (req, res) => {
 
     res.status(200).json({ account: accnt });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -179,7 +180,7 @@ const getAccounts = async (req, res) => {
     if (!accounts) return res.status(404).send("No user found");
     res.status(200).json({ data: accounts });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });

@@ -14,7 +14,7 @@ const Authenticate = async (req, res, next) => {
         next();
       });
     } catch (e) {
-      console.error(e);
+      console.error(err.message);
       res.status(500).send({ message: "Invalid Token" });
     }
   }

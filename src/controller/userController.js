@@ -24,12 +24,12 @@ const registerUser = async (req, res, next) => {
       email: req.body.email,
       password: password,
       role: req.body.role,
+      phone_number: req.body.phonenumber,
     });
 
     res.send(getJsonToken(user));
-
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -60,7 +60,7 @@ const signInUser = async (req, res, next) => {
 
     res.send(getJsonToken(user));
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -85,7 +85,7 @@ const getUser = async (req, res, next) => {
     if (!user) return res.status(400).json({ message: "user does not exist" });
     res.status(200).json({ data: user });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -95,11 +95,11 @@ const getUser = async (req, res, next) => {
 const getUsers = async (req, res) => {
   try {
     const users = await User.findAll();
-    
+
     if (!users) return res.status(404).send("No user found");
     res.status(200).json({ data: users });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -109,13 +109,8 @@ const getUsers = async (req, res) => {
 const updateUser = async (req, res, next) => {
   try {
     let user = await User.findOne({
-      where: { email: req.body.email },
+      where: { email: req.user.email },
     });
-
-    if (!user) return res.status(400).json({ message: "user does not exist" });
-
-    if (req.user.email !== user.email)
-      return res.status(403).json("You can't edit this Profile");
 
     const result = await User.update(
       {
@@ -126,18 +121,29 @@ const updateUser = async (req, res, next) => {
 
       {
         where: {
-          email: req.body.email,
+          email: user.email,
         },
       }
     );
 
-    let updatedUser = await User.findOne({
-      where: { email: req.body.email },
-    });
+    let updatedUser = await User.findOne(
+      {
+        attributes: [
+          "firstname",
+          "lastname",
+          "email",
+          "phone_number",
+          "createdAt",
+        ],
+      },
+      {
+        where: { email: user.email },
+      }
+    );
 
     res.status(200).json({ data: updatedUser });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -160,7 +166,7 @@ const deleteUser = async (req, res, next) => {
 
     res.status(200).json({ message: "User deleted" });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });

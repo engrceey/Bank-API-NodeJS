@@ -57,7 +57,7 @@ const deposit = async (req, res) => {
 
     res.status(200).json({ message: trans });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     await t.rollback();
     res
       .status(500)
@@ -118,7 +118,7 @@ const withdraw = async (req, res) => {
       throw new Error(error);
     }
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -157,7 +157,7 @@ const getTransaction = async (req, res) => {
 
     res.status(200).json({ data: trans });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -203,7 +203,7 @@ const getAllTransactions = async (req, res) => {
 
     res.status(200).json({ data: trans });
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });
@@ -286,7 +286,7 @@ const transfer = async (req, res) => {
       throw new Error(error);
     }
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     res
       .status(500)
       .json({ message: "Something went wrong, we're working on it" });

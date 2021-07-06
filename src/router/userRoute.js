@@ -3,7 +3,8 @@ const { Authenticate, isAdmin } = require("../middleware/authMiddleware");
 const {
   validateSignUpDetails,
   validateLoginDetails,
-} = require("../middleware/validationMiddleware");
+  validateUpdateDetails
+} = require("../middleware/userValidationMiddleware");
 const {
   registerUser,
   signInUser,
@@ -17,13 +18,13 @@ const router = express.Router();
 
 router.post(
   "/register",
-  // validateSignUpDetails,
+  validateSignUpDetails,
   registerUser
 );
 
 router.post(
   "/signin",
-  // validateLoginDetails,
+  validateLoginDetails,
   signInUser
 );
 
@@ -31,7 +32,7 @@ router.get("/users", Authenticate, isAdmin, getUsers);
 
 router.get("/email", Authenticate, getUser);
 
-router.patch("/email", Authenticate, updateUser);
+router.patch("/",validateUpdateDetails, Authenticate, updateUser);
 
 router.delete("/email", Authenticate, isAdmin, deleteUser);
 

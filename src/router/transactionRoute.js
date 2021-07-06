@@ -32,7 +32,7 @@ router.get(
   getAllTransactions
 )
 
-router.get(
+router.post(
   '/transfer',
   Authenticate,
   transfer
