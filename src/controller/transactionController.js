@@ -1,6 +1,8 @@
 const db = require("../database/models");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const request = require("request");
+const converter = require("../Helper/currencyConverter")
 const { account, User, transaction, sequelize } = db;
 
 const deposit = async (req, res) => {
@@ -65,6 +67,33 @@ const deposit = async (req, res) => {
   }
 };
 
+const convertCurrency = (req, res) => {
+  const fixerKey = process.env.CURRENCY_APIKEY;
+  // Request URL
+
+  const urlnew = `http://api.exchangeratesapi.io/v1/latest?access_key=${fixerKey}`
+  var url = `http://api.exchangeratesapi.io/v1/convert?access_key=${fixerKey}&from=${req.body.from}&to=${req.body.to} & amount = ${req.body.amount}`;
+
+  request(urlnew, (error, response, body) => {
+    // Printing the error if occurred
+    let data = JSON.parse(body);
+    if (error) {
+      return res.status(400).json({ error });
+    }
+    // Printing status code
+
+    const {rates} = data
+
+    let fromRate = rates[req.body.from];
+    let toRate = rates[req.body.to];
+
+    
+    converter(fromRate,toRate, req.body.amount)
+
+    res.json({ fromRate,toRate });
+  });
+};
+
 const withdraw = async (req, res) => {
   try {
     const accnt = await account.findOne({
@@ -92,7 +121,7 @@ const withdraw = async (req, res) => {
             accountBalance: newBalance,
             currency: req.body.currency,
           },
-          { where: { accountNumber: accnt.accountNumber} },
+          { where: { accountNumber: accnt.accountNumber } },
           {
             transaction: t,
           }
@@ -299,4 +328,5 @@ module.exports = {
   getTransaction,
   getAllTransactions,
   transfer,
+  convertCurrency,
 };
