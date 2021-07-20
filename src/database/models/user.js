@@ -50,6 +50,14 @@ module.exports = (sequelize, DataTypes) => {
     phone_number: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    isVerified: {
+      type: DataTypes.ENUM,
+      values: ["PENDING", "ACTIVE"],
+      defaultValue: "PENDING",
+    },
+    confirmationCode: {
+      type: DataTypes.STRING
     }
   }, {});
   User.associate = function(models) {

@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const DB = require("../database/models");
+const { User } = DB;
 
 const Authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -29,4 +30,27 @@ const isAdmin = async (req, res, next) => {
   next();
 };
 
-module.exports = { Authenticate, isAdmin };
+const isEmailVrified = async (req, res, next) => {
+  try {
+    const { email } = req.user;
+
+    let loginUser = await User.findOne({
+      where: { email: email },
+    });
+
+    if (loginUser.isVerified == "PENDING") {
+      return res
+        .status(200)
+        .json({
+          message: "Account not veerified, Click email link to verify account",
+        });
+    } else {
+      return next();
+    }
+  } catch (e) {
+    console.error(err.message);
+    res.status(500).send({ message: "An error occurred" });
+  }
+};
+
+module.exports = { Authenticate, isAdmin, isEmailVrified };

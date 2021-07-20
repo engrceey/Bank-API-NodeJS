@@ -1,6 +1,7 @@
 const db = require("../database/models");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { sendConfirmationEmail } = require("../services/sendEmailService");
 const { User } = db;
 
 const registerUser = async (req, res, next) => {
@@ -18,6 +19,10 @@ const registerUser = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     let password = await bcrypt.hash(req.body.password, salt);
 
+    const token = getJsonToken(req.body.email, req.body.role);
+
+    console.log(token);
+
     let user = await User.create({
       firstname: req.body.firstname,
       lastname: req.body.lastname,
@@ -25,9 +30,52 @@ const registerUser = async (req, res, next) => {
       password: password,
       role: req.body.role,
       phone_number: req.body.phonenumber,
+      confirmationCode: token,
     });
 
-    res.send(getJsonToken(user));
+    let result = sendConfirmationEmail(
+      req.body.firstname,
+      req.body.email,
+      token
+    );
+
+    if (result) {
+      return res.json({ token, result });
+    } else {
+      return res.send("Error Occured");
+    }
+  } catch (err) {
+    console.error(err.message);
+    res
+      .status(500)
+      .json({ message: "Something went wrong, we're working on it" });
+  }
+};
+
+const verifyUser = async (req, res, next) => {
+  try {
+    const user = User.findOne({
+      confirmationCode: req.params.confirmationCode,
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .send({ message: "Verification failed, Resend Link" });
+    }
+    await User.update(
+      {
+        isVerified: "ACTIVE",
+      },
+
+      {
+        where: {
+          confirmationCode: req.params.confirmationCode,
+        },
+      }
+    );
+
+    res.status(200).json({ message: "Email confirmed" });
   } catch (err) {
     console.error(err.message);
     res
@@ -58,7 +106,7 @@ const signInUser = async (req, res, next) => {
       });
     }
 
-    res.send(getJsonToken(user));
+    res.send(getJsonToken(user.email, user.role));
   } catch (err) {
     console.error(err.message);
     res
@@ -67,13 +115,13 @@ const signInUser = async (req, res, next) => {
   }
 };
 
-const getJsonToken = (user) => {
+const getJsonToken = (Email, Role) => {
   const accessToken = jwt.sign(
-    { email: user.email, role: user.role },
+    { email: Email, role: Role },
     process.env.SECRET,
     { expiresIn: "120m" }
   );
-  return { token: accessToken };
+  return accessToken;
 };
 
 const getUser = async (req, res, next) => {
@@ -180,4 +228,5 @@ module.exports = {
   getUsers,
   updateUser,
   deleteUser,
+  verifyUser,
 };

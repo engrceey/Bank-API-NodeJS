@@ -12,6 +12,7 @@ const {
   getUsers,
   updateUser,
   deleteUser,
+  verifyUser
 } = require("../controller/userController");
 
 const router = express.Router();
@@ -35,5 +36,7 @@ router.get("/email", Authenticate, getUser);
 router.patch("/",validateUpdateDetails, Authenticate, updateUser);
 
 router.delete("/email", Authenticate, isAdmin, deleteUser);
+
+router.get("/auth/confirm/:confirmationCode", verifyUser)
 
 module.exports = router;
